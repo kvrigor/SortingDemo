@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <ctime>
 #include <sstream>
+#include <random>
 // Returns the amount of milliseconds elapsed since the UNIX epoch.
 // Source copied from http://stackoverflow.com/a/1861337/6592879
 typedef long long int64; typedef unsigned long long uint64;
@@ -87,6 +88,25 @@ class SimpleTimer
 
 };
 
+class RandomNumGen
+{
+	private:
+		std::mt19937 mersenne_rng;
+
+	public:
+		RandomNumGen()
+		{
+			mersenne_rng.seed(GetTimeMs64());
+		}
+
+		int Next(int min, int max)
+		{
+			std::uniform_int_distribution<int> dist(min, max);
+			return dist(mersenne_rng);
+		}
+
+};
+
 
 // Source copied from: http://www.cplusplus.com/articles/4z18T05o/#Windows
 void ClearScreen()
@@ -140,9 +160,16 @@ bool IsKeyDown(int vKey)
 	return (GetAsyncKeyState(vKey) & 0x8000);
 }
 
+
+
 uint64 GetRandomNumber(uint64 seedValue = GetTimeMs64())
 {
 	return seedValue+rand();
+}
+
+uint64 GetRandomNumber(uint64 maxValue, uint64 seedValue = GetTimeMs64())
+{
+	return seedValue+rand() % (maxValue + 1);
 }
 
 #endif /* UTILS_H_ */
