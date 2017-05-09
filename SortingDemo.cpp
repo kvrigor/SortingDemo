@@ -24,7 +24,7 @@ void QuickSort(int [], int);
 void GenerateRandomList(int [], int, int = 1, int = 999);
 void GenerateNearlySortedRandomList(const int [], int, int []);
 void PrintArray(int [], int, int = 10);
-bool SaveListToFile(int [], int, char *);
+bool SaveListToFile(int [], int, const char []);
 
 int main(int argc, char* argv[])
 {
@@ -42,30 +42,41 @@ int main(int argc, char* argv[])
 	   int algoChoice;
 	   int arraySize;
 	   char retryChoice;
+	   SetConsoleBufferHeight(1000);
 	   do
 	   {
 		   ClearScreen();
 		   cout<<"Set array size: ";
 		   cin>>arraySize;
-
-		   int randomNumbers[arraySize];
-		   int sortedNumbers[arraySize];
-		   GenerateRandomList(randomNumbers, arraySize);
-		   cout<<endl<<"Unsorted numbers:"<<endl;
-		   PrintArray(randomNumbers, arraySize);
-		   SaveListToFile(randomNumbers, arraySize, "unsorted.txt");
-		   std::copy(randomNumbers, randomNumbers+arraySize, sortedNumbers);
-
-		   cout<<endl<<"Select algorithm (0 = Quick sort, 1= Shell sort): ";
+		   cout<<"Select algorithm (0 = Quick sort, 1= Shell sort): ";
 		   cin>>algoChoice;
-		   if (algoChoice == 0)
-			   QuickSort(sortedNumbers, arraySize);
-		   else
-			   ShellSort(sortedNumbers, arraySize);
 
-		   cout<<endl<<"Sorted numbers:"<<endl;
-		   PrintArray(sortedNumbers, arraySize);
-		   SaveListToFile(randomNumbers, arraySize, "sorted.txt");
+		   //initialize random list
+		   int randomNums[arraySize], sorted_random[arraySize], sorted_nearlyOrdered[arraySize];
+		   GenerateRandomList(randomNums, arraySize);
+		   cout<<endl<<"Unsorted numbers:"<<endl;
+		   PrintArray(randomNums, arraySize);
+		   SaveListToFile(randomNums, arraySize, "unsorted.txt");
+
+		   //1st sort
+		   std::copy(randomNums, randomNums+arraySize, sorted_random);
+		   if (algoChoice == 0)
+			   QuickSort(sorted_random, arraySize);
+		   else
+			   ShellSort(sorted_random, arraySize);
+		   cout<<endl<<"1st sort, from random list:"<<endl;
+		   PrintArray(sorted_random, arraySize);
+		   SaveListToFile(sorted_random, arraySize, "sorted_random.txt");
+
+		   //2nd sort
+		   GenerateNearlySortedRandomList(sorted_random, arraySize, sorted_nearlyOrdered);
+		   if (algoChoice == 0)
+			   QuickSort(sorted_nearlyOrdered, arraySize);
+		   else
+			   ShellSort(sorted_nearlyOrdered, arraySize);
+		   cout<<endl<<"2nd sort, from nearly ordered list:"<<endl;
+		   PrintArray(sorted_nearlyOrdered, arraySize);
+		   SaveListToFile(sorted_nearlyOrdered, arraySize, "sorted_nearlyOrdered.txt");
 
 		   cout<<endl<<"Retry (y/n)? ";
 		   cin>>retryChoice;
@@ -93,6 +104,13 @@ void GenerateRandomList(int nums[], int size, int minVal, int maxVal)
 
 }
 
+void GenerateNearlySortedRandomList(const int sortedNums[], int size, int nearlySortedNums[])
+{
+	std::copy(sortedNums, sortedNums+size, nearlySortedNums);
+	int temp = nearlySortedNums[18];
+	nearlySortedNums[18] = nearlySortedNums[19];
+	nearlySortedNums[19] = temp;
+}
 void PrintArray(int nums[], int size, int numsPerLine)
 {
 	for (int i = 1; i <= size; i++)
@@ -105,7 +123,7 @@ void PrintArray(int nums[], int size, int numsPerLine)
 	}
 }
 
-bool SaveListToFile(int nums[], int size, char* fileName)
+bool SaveListToFile(int nums[], int size, const char fileName[])
 {
 	std::ofstream myfile(fileName, std::ofstream::out | std::ofstream::trunc);
 	if (myfile.is_open())
