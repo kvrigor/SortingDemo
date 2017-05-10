@@ -156,6 +156,7 @@ int main(int argc, char* argv[])
 		   cin>>retryChoice;
 	   }while(retryChoice == 'y');
    }
+   return 0;
 }
 
 // -----------------------  sorting algorithms -----------------------
@@ -190,6 +191,7 @@ void ShellSort_Benchmark(int nums[], int size)
     stopwatch.Start();
     results = ShellSort(nums, size);
     cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+    SaveListToFile(nums, size, "shell.log"); //TODO: assign different filenames to multiple log files
 }
 
 void QuickSort_Benchmark(int nums[], int size)
@@ -200,6 +202,7 @@ void QuickSort_Benchmark(int nums[], int size)
     stopwatch.Start();
     results = QuickSort(nums, size);
     cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+    SaveListToFile(nums, size, "quick.log"); //TODO: assign different filenames to multiple log files
 }
 
 void GenerateRandomList(int nums[], int size, int minVal, int maxVal)
