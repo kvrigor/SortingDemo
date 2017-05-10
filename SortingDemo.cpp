@@ -12,15 +12,23 @@
 #include <conio.h>
 #include "utils.h"
 
-
 using std::cout;
 using std::cin;
+using std::cerr;
 using std::endl;
 using std::string;
 
 // -----------------------  prototypes -----------------------
-void ShellSort(int [], int);
-void QuickSort(int [], int);
+struct AlgoStats
+{
+	int numMoves;
+	int numCompares;
+};
+
+AlgoStats ShellSort(int [], int);
+AlgoStats QuickSort(int [], int);
+void ShellSort_Benchmark(int [], int);
+void QuickSort_Benchmark(int [], int);
 void GenerateRandomList(int [], int, int = 1, int = 999);
 void GenerateNearlySortedRandomList(const int [], int, int []);
 void PrintArray(int [], int, int = 10);
@@ -30,11 +38,60 @@ int main(int argc, char* argv[])
 {
    if (argc > 1)
    {
-	  //TODO: scripting mode
-	  //	   cout << "argc = " << argc << endl;
-	  //	   for(int i = 0; i < argc; i++)
-	  //		   cout << "argv[" << i << "] = " << argv[i] << endl;
-	  //	   return 0;
+	   char * algo;
+	   int arraySize;
+	   int loop = 1;
+
+	   for(int i = 1; i < argc; i = i + 2)
+	   {
+		   if (strcasecmp(argv[i], "-algo") == 0)
+			   algo = argv[i+1];
+		   else if (strcasecmp(argv[i], "-size") == 0)
+			   arraySize = atoi(argv[i+1]);
+		   else if (strcasecmp(argv[i], "-loop") == 0)
+			   loop = atoi(argv[i+1]);
+	   }
+
+	   int randomNums[arraySize], sorted_random[arraySize], sorted_nearlyOrdered[arraySize];
+	   int trial = 1;
+	   do
+	   {
+		   cout<<"*** Trial "<<trial<<" ***"<<endl;
+		   GenerateRandomList(randomNums, arraySize);
+		   SaveListToFile(randomNums, arraySize, "unsorted.txt");
+		   std::copy(randomNums, randomNums+arraySize, sorted_random);
+
+		   cout<<endl<<"1st run: Sort "<<arraySize<<"-element random list";
+		   if (strcasecmp(algo, "quick") == 0)
+			   QuickSort_Benchmark(sorted_random, arraySize);
+		   else if (strcasecmp(algo, "shell") == 0)
+			   ShellSort_Benchmark(sorted_random, arraySize);
+		   else if (strcasecmp(algo, "both") == 0)
+		   {
+			   QuickSort_Benchmark(sorted_random, arraySize);
+			   std::copy(randomNums, randomNums+arraySize, sorted_random);
+			   ShellSort_Benchmark(sorted_random, arraySize);
+		   }
+		   else
+		   {
+			   cerr<<"ERROR - Unsupported sorting algorithm '"<<algo<<"'"<<endl;
+			   return -1;
+		   }
+
+		   GenerateNearlySortedRandomList(sorted_random, arraySize, sorted_nearlyOrdered);
+		   cout<<endl<<"2nd run: Sort "<<arraySize<<"-element nearly ordered list";
+		   if (strcasecmp(algo, "quick") == 0)
+			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize);
+		   else if (strcasecmp(algo, "shell") == 0)
+			   ShellSort_Benchmark(sorted_nearlyOrdered, arraySize);
+		   else if (strcasecmp(algo, "both") == 0)
+		   {
+			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize);
+			   std::copy(sorted_random, sorted_random+arraySize, sorted_nearlyOrdered);
+			   ShellSort_Benchmark(sorted_random, arraySize);
+		   }
+		   cout<<endl;
+	   }while (trial++ < loop);
    }
    else
    {
@@ -42,6 +99,8 @@ int main(int argc, char* argv[])
 	   int algoChoice;
 	   int arraySize;
 	   char retryChoice;
+	   SimpleTimer stopwatch;
+	   AlgoStats results;
 	   SetConsoleBufferHeight(1000);
 	   do
 	   {
@@ -61,20 +120,35 @@ int main(int argc, char* argv[])
 		   //1st sort
 		   std::copy(randomNums, randomNums+arraySize, sorted_random);
 		   if (algoChoice == 0)
-			   QuickSort(sorted_random, arraySize);
+		   {
+			   stopwatch.Start();
+			   results = QuickSort(sorted_random, arraySize);
+		   }
 		   else
-			   ShellSort(sorted_random, arraySize);
+		   {
+			   stopwatch.Start();
+			   results = ShellSort(sorted_random, arraySize);
+		   }
 		   cout<<endl<<"1st sort, from random list:"<<endl;
+		   cout<<"# moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+
 		   PrintArray(sorted_random, arraySize);
 		   SaveListToFile(sorted_random, arraySize, "sorted_random.txt");
 
 		   //2nd sort
 		   GenerateNearlySortedRandomList(sorted_random, arraySize, sorted_nearlyOrdered);
 		   if (algoChoice == 0)
-			   QuickSort(sorted_nearlyOrdered, arraySize);
+		   {
+			   stopwatch.Restart();
+			   results = QuickSort(sorted_nearlyOrdered, arraySize);
+		   }
 		   else
-			   ShellSort(sorted_nearlyOrdered, arraySize);
+		   {
+			   stopwatch.Restart();
+			   results = ShellSort(sorted_nearlyOrdered, arraySize);
+		   }
 		   cout<<endl<<"2nd sort, from nearly ordered list:"<<endl;
+		   cout<<"# moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
 		   PrintArray(sorted_nearlyOrdered, arraySize);
 		   SaveListToFile(sorted_nearlyOrdered, arraySize, "sorted_nearlyOrdered.txt");
 
@@ -86,14 +160,46 @@ int main(int argc, char* argv[])
 
 // -----------------------  sorting algorithms -----------------------
 
-void ShellSort(int nums[], int size)
+AlgoStats ShellSort(int nums[], int size)
 {
-	//TODO
+	//TODO - method body
+
+	//Assign these values
+	AlgoStats results;
+	results.numCompares = 0;
+	results.numMoves = 0;
+	return results;
 }
 
-void QuickSort(int nums[], int size)
+AlgoStats QuickSort(int nums[], int size)
 {
-	//TODO
+	//TODO - method body
+
+	//Set these values
+	AlgoStats results;
+	results.numCompares = 0;
+	results.numMoves = 0;
+	return results;
+}
+
+void ShellSort_Benchmark(int nums[], int size)
+{
+	SimpleTimer stopwatch;
+    AlgoStats results;
+    cout<<endl<<"  Running ShellSort..."<<endl;
+    stopwatch.Start();
+    results = ShellSort(nums, size);
+    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+}
+
+void QuickSort_Benchmark(int nums[], int size)
+{
+	SimpleTimer stopwatch;
+    AlgoStats results;
+    cout<<endl<<"  Running Quicksort..."<<endl;
+    stopwatch.Start();
+    results = QuickSort(nums, size);
+    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
 }
 
 void GenerateRandomList(int nums[], int size, int minVal, int maxVal)
@@ -113,6 +219,7 @@ void GenerateNearlySortedRandomList(const int sortedNums[], int size, int nearly
 }
 void PrintArray(int nums[], int size, int numsPerLine)
 {
+	cout<<endl;
 	for (int i = 1; i <= size; i++)
 	{
 		if (i % numsPerLine == 1)
