@@ -163,12 +163,29 @@ int main(int argc, char* argv[])
 
 AlgoStats ShellSort(int nums[], int size)
 {
+	int moves = 0;
+	int comp = 0;
 	//TODO - method body
+	for (int gap = size / 2; gap > 0; gap /= 2)
+	{
+		for (int i = gap; i < size; ++i)
+		{
+			int tmp = std::move(nums[i]);
+			int j = i;
+			
+			for ( ; j >= gap && (comp++,tmp < nums[j - gap]); j -= gap)
+			{
+				nums[j] = std::move(nums[j - gap]);
+				moves++;
+			}
+			nums[j] = std::move(tmp);
+		}
+	}
 
 	//Assign these values
 	AlgoStats results;
-	results.numCompares = 0;
-	results.numMoves = 0;
+	results.numCompares = comp;
+	results.numMoves = moves;
 	return results;
 }
 
