@@ -28,11 +28,10 @@ struct AlgoStats
 AlgoStats ShellSort(int [], int);
 AlgoStats QuickSort(int [], int, int);
 void ShellSort_Benchmark(int [], int);
-void QuickSort_Benchmark(int [], int, int);
+void QuickSort_Benchmark(int [], int);
 void GenerateRandomList(int [], int, int = 1, int = 999);
 void GenerateNearlySortedRandomList(const int [], int, int []);
 void PrintArray(int [], int, int = 10);
-void QuickSor(int[],int,int);
 bool SaveListToFile(int [], int, const char []);
 
 int main(int argc, char* argv[])
@@ -64,12 +63,12 @@ int main(int argc, char* argv[])
 
 		   cout<<endl<<"1st run: Sort "<<arraySize<<"-element random list";
 		   if (strcasecmp(algo, "quick") == 0)
-			   QuickSort_Benchmark(sorted_random, 0, arraySize);
+			   QuickSort_Benchmark(sorted_random, arraySize);
 		   else if (strcasecmp(algo, "shell") == 0)
 			   ShellSort_Benchmark(sorted_random, arraySize);
 		   else if (strcasecmp(algo, "both") == 0)
 		   {
-			   QuickSort_Benchmark(sorted_random, 0,arraySize);
+			   QuickSort_Benchmark(sorted_random, arraySize);
 			   std::copy(randomNums, randomNums+arraySize, sorted_random);
 			   ShellSort_Benchmark(sorted_random, arraySize);
 		   }
@@ -82,12 +81,12 @@ int main(int argc, char* argv[])
 		   GenerateNearlySortedRandomList(sorted_random, arraySize, sorted_nearlyOrdered);
 		   cout<<endl<<"2nd run: Sort "<<arraySize<<"-element nearly ordered list";
 		   if (strcasecmp(algo, "quick") == 0)
-			   QuickSort_Benchmark(sorted_nearlyOrdered, 0, arraySize);
+			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize);
 		   else if (strcasecmp(algo, "shell") == 0)
 			   ShellSort_Benchmark(sorted_nearlyOrdered, arraySize);
 		   else if (strcasecmp(algo, "both") == 0)
 		   {
-			   QuickSort_Benchmark(sorted_nearlyOrdered, 0,arraySize);
+			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize);
 			   std::copy(sorted_random, sorted_random+arraySize, sorted_nearlyOrdered);
 			   ShellSort_Benchmark(sorted_random, arraySize);
 		   }
@@ -123,7 +122,7 @@ int main(int argc, char* argv[])
 		   if (algoChoice == 0)
 		   {
 			   stopwatch.Start();
-			   results = QuickSort(sorted_random, 0,arraySize-1);
+			   results = QuickSort(sorted_random, 0, arraySize - 1);
 		   }
 		   else
 		   {
@@ -141,7 +140,7 @@ int main(int argc, char* argv[])
 		   if (algoChoice == 0)
 		   {
 			   stopwatch.Restart();
-			   results = QuickSort(sorted_nearlyOrdered, 0, arraySize-1);
+			   results = QuickSort(sorted_nearlyOrdered, 0, arraySize - 1);
 		   }
 		   else
 		   {
@@ -190,39 +189,59 @@ AlgoStats ShellSort(int nums[], int size)
 	return results;
 }
 
-AlgoStats QuickSort(int arr[], int left, int right){
-     
-      int i = left, j = right;
-      int tmp;
-      int pivot = arr[(left + right) / 2];
+AlgoStats QuickSort(int arr[], int lowerBound, int upperBound){
+    int left = lowerBound;
+    int right = upperBound;
+	int i = left, j = right;
+    int tmp;
+    int pivot = arr[(left + right) / 2];
 
-      /* partition */
-      while (i <= j) {
-           while (arr[i] < pivot)
-                  i++;
-            while (arr[j] > pivot)
-                  j--;
-            if (i <= j) {
-                  tmp = arr[i];
-                  arr[i] = arr[j];
-                 arr[j] = tmp;
-                  i++;
-                 j--;
-            }
-     };
+	int moves = 0;
+	int comp = 0;
+    /* partition */
+    while (i <= j) {
+    	comp++;
+        while (arr[i] < pivot) {
+        	i++;
+        	comp++;
+		}
+		comp++;
+        while (arr[j] > pivot) {
+        	j--;
+        	comp++;
+		}
+        if (i <= j) {
+            tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+            i++;
+            j--;
+            moves++;
+        }
+    };
 
-      /* recursion */
-      if (left < j)
-            QuickSort(arr, left, j);
-      if (i < right)
-           QuickSort(arr, i, right);
+    /* recursion */
+    if (left < j)
+    {
+		AlgoStats result1;
+        result1 = QuickSort(arr, left, j);
+        comp += result1.numCompares;
+        moves += result1.numMoves;
+	}
+    if (i < right)
+    {
+		AlgoStats result2;
+        result2 = QuickSort(arr, i, right);
+        comp += result2.numCompares;
+        moves += result2.numMoves;
+	}
 
 	//TODO - method body
 
 	//Set these values
 	AlgoStats results;
-	results.numCompares = 0;
-	results.numMoves = 0;
+	results.numCompares = comp;
+	results.numMoves = moves;
 	return results;
 }
 
@@ -237,13 +256,13 @@ void ShellSort_Benchmark(int nums[], int size)
     SaveListToFile(nums, size, "shell.log"); //TODO: assign different filenames to multiple log files
 }
 
-void QuickSort_Benchmark(int nums[],int left, int size)
+void QuickSort_Benchmark(int nums[], int size)
 {
 	SimpleTimer stopwatch;
     AlgoStats results;
     cout<<endl<<"  Running Quicksort..."<<endl;
     stopwatch.Start();
-    results = QuickSort(nums, 0,size);
+    results = QuickSort(nums, 0, size - 1);
     cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
     SaveListToFile(nums, size, "quick.log"); //TODO: assign different filenames to multiple log files
 }
