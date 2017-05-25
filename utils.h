@@ -30,7 +30,6 @@ uint64 GetTimeMs64()
 	uint64 ret = li.QuadPart;
 	ret -= 116444736000000000LL; /* Convert from file time to UNIX epoch time. */
 	ret /= 10000; /* From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals */
-
 	return ret;
 }
 
@@ -38,31 +37,42 @@ uint64 GetTimeMs64()
 class SimpleTimer
 {
 	private:
-		uint64 _startTime;
-		uint64 _accumulatedTime;
+		double _PCFreq_us;
+		__int64 _startTicks;
+		__int64 _accumulatedTicks;
 		bool _timerStarted;
+		__int64 GetCounter()
+		{
+			LARGE_INTEGER counter;
+			QueryPerformanceCounter(&counter);
+			return counter.QuadPart;
+		}
+
 	public:
 		SimpleTimer(bool startTimer = false)
 		{
-			_accumulatedTime = 0;
+			_accumulatedTicks = 0;
 			startTimer ? Start() : Reset();
 		}
 		void Start()
 		{
-			_startTime = GetTimeMs64();
+			LARGE_INTEGER freq;
+			QueryPerformanceFrequency(&freq);
+			_PCFreq_us = double(freq.QuadPart)/1000000.0;
+			_startTicks = GetCounter();
 			_timerStarted = true;
 		}
 		void Reset()
 		{
-			_startTime = 0;
+			_startTicks = 0;
 			_timerStarted = false;
-			_accumulatedTime = 0;
+			_accumulatedTicks = 0;
 		}
 		void Pause()
 		{
 			if (_timerStarted)
 			{
-				_accumulatedTime += (GetTimeMs64() - _startTime);
+				_accumulatedTicks += (GetCounter() - _startTicks);
 				_timerStarted = false;
 			}
 		}
@@ -72,20 +82,19 @@ class SimpleTimer
 			Start();
 		}
 		bool IsRunning() { return _timerStarted; }
-		uint64 Elapsed_ms()
+		double Elapsed_us()
 		{
 			if (_timerStarted)
-				return (_accumulatedTime + (GetTimeMs64() - _startTime));
+				return (_accumulatedTicks + (GetCounter() - _startTicks)) / _PCFreq_us;
 			else
-				return _accumulatedTime;
+				return _accumulatedTicks / _PCFreq_us;
 		}
-		std::string Elapsed_ms_str()
+		std::string Elapsed_us_str()
 		{
 			std::stringstream elapsedTime;
-			elapsedTime<<Elapsed_ms();
-			return (elapsedTime.str() + " ms");
+			elapsedTime<<Elapsed_us();
+			return (elapsedTime.str() + " us");
 		}
-
 };
 
 class RandomNumGen
@@ -159,8 +168,6 @@ bool IsKeyDown(int vKey)
 {
 	return (GetAsyncKeyState(vKey) & 0x8000);
 }
-
-
 
 uint64 GetRandomNumber(uint64 seedValue = GetTimeMs64())
 {

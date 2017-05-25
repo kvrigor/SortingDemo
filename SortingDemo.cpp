@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 			   results = ShellSort(sorted_random, arraySize);
 		   }
 		   cout<<endl<<"1st sort, from random list:"<<endl;
-		   cout<<"# moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+		   cout<<"# moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_us_str()<<endl;
 
 		   PrintArray(sorted_random, arraySize);
 		   SaveListToFile(sorted_random, arraySize, "sorted_random.txt");
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 			   results = ShellSort(sorted_nearlyOrdered, arraySize);
 		   }
 		   cout<<endl<<"2nd sort, from nearly ordered list:"<<endl;
-		   cout<<"# moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+		   cout<<"# moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_us_str()<<endl;
 		   PrintArray(sorted_nearlyOrdered, arraySize);
 		   SaveListToFile(sorted_nearlyOrdered, arraySize, "sorted_nearlyOrdered.txt");
 
@@ -252,7 +252,7 @@ void ShellSort_Benchmark(int nums[], int size)
     cout<<endl<<"  Running ShellSort..."<<endl;
     stopwatch.Start();
     results = ShellSort(nums, size);
-    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_us_str()<<endl;
     SaveListToFile(nums, size, "shell.log"); //TODO: assign different filenames to multiple log files
 }
 
@@ -263,7 +263,7 @@ void QuickSort_Benchmark(int nums[], int size)
     cout<<endl<<"  Running Quicksort..."<<endl;
     stopwatch.Start();
     results = QuickSort(nums, 0, size - 1);
-    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_ms_str()<<endl;
+    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_us_str()<<endl;
     SaveListToFile(nums, size, "quick.log"); //TODO: assign different filenames to multiple log files
 }
 
