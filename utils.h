@@ -89,11 +89,14 @@ class SimpleTimer
 			else
 				return _accumulatedTicks / _PCFreq_us;
 		}
-		std::string Elapsed_us_str()
+		std::string Elapsed_us_str(bool includeUnit = true)
 		{
 			std::stringstream elapsedTime;
 			elapsedTime<<Elapsed_us();
-			return (elapsedTime.str() + " us");
+			if (includeUnit)
+				return (elapsedTime.str() + " us");
+			else
+				return (elapsedTime.str());
 		}
 };
 

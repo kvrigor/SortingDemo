@@ -27,8 +27,8 @@ struct AlgoStats
 
 AlgoStats ShellSort(int [], int);
 AlgoStats QuickSort(int [], int, int);
-void ShellSort_Benchmark(int [], int);
-void QuickSort_Benchmark(int [], int);
+void ShellSort_Benchmark(int [], int, string);
+void QuickSort_Benchmark(int [], int, string);
 void GenerateRandomList(int [], int, int = 1, int = 999);
 void GenerateNearlySortedRandomList(const int [], int, int []);
 void PrintArray(int [], int, int = 10);
@@ -54,23 +54,24 @@ int main(int argc, char* argv[])
 
 	   int randomNums[arraySize], sorted_random[arraySize], sorted_nearlyOrdered[arraySize];
 	   int trial = 1;
+	   string trialStr;
+	   cout<<endl<<endl<<" *** Array size =  "<<arraySize<<endl<<endl;
+	   cout<<"\tMoves\tComp\tTime_us";
 	   do
 	   {
-		   cout<<"*** Trial "<<trial<<" ***"<<endl;
+		   trialStr = std::to_string(trial);
 		   GenerateRandomList(randomNums, arraySize);
 		   SaveListToFile(randomNums, arraySize, "unsorted.txt");
 		   std::copy(randomNums, randomNums+arraySize, sorted_random);
-
-		   cout<<endl<<"1st run: Sort "<<arraySize<<"-element random list";
 		   if (strcasecmp(algo, "quick") == 0)
-			   QuickSort_Benchmark(sorted_random, arraySize);
+			   QuickSort_Benchmark(sorted_random, arraySize, "quick_rnd" + trialStr);
 		   else if (strcasecmp(algo, "shell") == 0)
-			   ShellSort_Benchmark(sorted_random, arraySize);
+			   ShellSort_Benchmark(sorted_random, arraySize, "shell_rnd" + trialStr);
 		   else if (strcasecmp(algo, "both") == 0)
 		   {
-			   QuickSort_Benchmark(sorted_random, arraySize);
+			   QuickSort_Benchmark(sorted_random, arraySize, "quick_rnd" + trialStr);
 			   std::copy(randomNums, randomNums+arraySize, sorted_random);
-			   ShellSort_Benchmark(sorted_random, arraySize);
+			   ShellSort_Benchmark(sorted_random, arraySize, "shell_rnd" + trialStr);
 		   }
 		   else
 		   {
@@ -79,18 +80,16 @@ int main(int argc, char* argv[])
 		   }
 
 		   GenerateNearlySortedRandomList(sorted_random, arraySize, sorted_nearlyOrdered);
-		   cout<<endl<<"2nd run: Sort "<<arraySize<<"-element nearly ordered list";
 		   if (strcasecmp(algo, "quick") == 0)
-			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize);
+			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize, "quick_nod" + trialStr);
 		   else if (strcasecmp(algo, "shell") == 0)
-			   ShellSort_Benchmark(sorted_nearlyOrdered, arraySize);
+			   ShellSort_Benchmark(sorted_nearlyOrdered, arraySize, "shell_nod" + trialStr);
 		   else if (strcasecmp(algo, "both") == 0)
 		   {
-			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize);
+			   QuickSort_Benchmark(sorted_nearlyOrdered, arraySize, "quick_nod" + trialStr);
 			   std::copy(sorted_random, sorted_random+arraySize, sorted_nearlyOrdered);
-			   ShellSort_Benchmark(sorted_random, arraySize);
+			   ShellSort_Benchmark(sorted_random, arraySize, "shell_nod" + trialStr);
 		   }
-		   cout<<endl;
 	   }while (trial++ < loop);
    }
    else
@@ -165,7 +164,7 @@ AlgoStats ShellSort(int nums[], int size)
 {
 	int moves = 0;
 	int comp = 0;
-	//TODO - method body
+
 	for (int gap = size / 2; gap > 0; gap /= 2)
 	{
 		for (int i = gap; i < size; ++i)
@@ -236,34 +235,29 @@ AlgoStats QuickSort(int arr[], int lowerBound, int upperBound){
         moves += result2.numMoves;
 	}
 
-	//TODO - method body
-
-	//Set these values
 	AlgoStats results;
 	results.numCompares = comp;
 	results.numMoves = moves;
 	return results;
 }
 
-void ShellSort_Benchmark(int nums[], int size)
+void ShellSort_Benchmark(int nums[], int size, string testLabel)
 {
 	SimpleTimer stopwatch;
     AlgoStats results;
-    cout<<endl<<"  Running ShellSort..."<<endl;
     stopwatch.Start();
     results = ShellSort(nums, size);
-    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_us_str()<<endl;
+    cout<<endl<<testLabel<<"\t"<<results.numMoves<<"\t"<<results.numCompares<<"\t"<<stopwatch.Elapsed_us_str(false);
     SaveListToFile(nums, size, "shell.log"); //TODO: assign different filenames to multiple log files
 }
 
-void QuickSort_Benchmark(int nums[], int size)
+void QuickSort_Benchmark(int nums[], int size, string testLabel)
 {
 	SimpleTimer stopwatch;
     AlgoStats results;
-    cout<<endl<<"  Running Quicksort..."<<endl;
     stopwatch.Start();
     results = QuickSort(nums, 0, size - 1);
-    cout<<"  # moves = "<<results.numMoves<<", # compares = "<<results.numCompares<<", Exec time = "<<stopwatch.Elapsed_us_str()<<endl;
+    cout<<endl<<testLabel<<"\t"<<results.numMoves<<"\t"<<results.numCompares<<"\t"<<stopwatch.Elapsed_us_str(false);
     SaveListToFile(nums, size, "quick.log"); //TODO: assign different filenames to multiple log files
 }
 
