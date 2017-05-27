@@ -169,15 +169,15 @@ AlgoStats ShellSort(int nums[], int size)
 	{
 		for (int i = gap; i < size; ++i)
 		{
-			int tmp = std::move(nums[i]);
+			int tmp = nums[i];
 			int j = i;
 			
 			for ( ; j >= gap && (comp++,tmp < nums[j - gap]); j -= gap)
 			{
-				nums[j] = std::move(nums[j - gap]);
+				nums[j] = nums[j - gap];
 				moves++;
 			}
-			nums[j] = std::move(tmp);
+			nums[j] = tmp;
 		}
 	}
 
