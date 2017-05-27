@@ -1,7 +1,7 @@
 //============================================================================
 // Name        : SortingDemo.cpp
 // Authors     : chester.tan, leandro.umali, paul.rigor
-// Version     : v0.0
+// Version     : v1.0
 // Description : Shell sort and quick sort comparison demo.
 // Git repo    :
 //============================================================================
